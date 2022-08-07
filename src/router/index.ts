@@ -16,7 +16,7 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/login',
-    name: 'Login',
+    name: 'login',
     component: ConnectView
   },
   {

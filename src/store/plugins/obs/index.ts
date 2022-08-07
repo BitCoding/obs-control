@@ -99,6 +99,7 @@ const ObsPlugin =  (store: Store<RootState>) => {
     store.dispatch('obs/init');
 
     client.on('Identified', () => store.dispatch('obs/connection/ready'))
+    client.on('ConnectionClosed', () => store.dispatch('obs/connection/closed'))
 
     client.on('VendorEvent', message => {
         console.log(message)

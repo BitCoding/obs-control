@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <b-navbar toggleable="lg" type="dark" variant="primary">
+    <b-navbar toggleable="md" type="dark" variant="primary">
       <b-container>
       <b-navbar-brand :to="{name:'home'}">OBS-Control</b-navbar-brand>
 
@@ -36,6 +36,12 @@
                 <span v-else>Stream aktivieren?</span>
               </b-popover>
             </b-nav-item>
+            <b-nav-item @click="toggleFullscreen">
+              <b-icon icon="arrows-fullscreen"/>
+            </b-nav-item>
+            <b-nav-item @click="disconnect">
+              <b-icon icon="power"/>
+            </b-nav-item>
           </b-navbar-nav>
         </b-navbar-nav>
       </b-collapse>
@@ -45,18 +51,32 @@
   </div>
 </template>
 <script lang="ts">
+import { mixins } from 'vue-class-component';
 import { Component, Vue } from 'vue-property-decorator';
 import { State, Getter, Mutation, Action, namespace } from 'vuex-class'
+import Fullscreen from "@/mixins/fullscreen";
 
 const obs = namespace('obs')
 @Component({})
-export default class App extends Vue {
+export default class App extends mixins(Fullscreen) {
 
   @obs.Getter connectionReady: boolean
   @obs.Getter isCamActive: boolean
   @obs.Getter isStreamActive: boolean
+
   @obs.Action('cam/toogle') toogleCam
-  @obs.Action('stram/toogle') toogleStream
+  @obs.Action('stream/toogle') toogleStream
+
+  @obs.Action('disconnect') obsDisconnect
+  async disconnect(event){
+    event.preventDefault()
+
+    this.obsDisconnect().then(
+        ()=>{
+          this.$router.push({'name':'login'})
+        }
+    )
+  }
 }
 </script>
 <style lang="scss">
