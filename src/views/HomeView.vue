@@ -1,8 +1,35 @@
 <template>
   <b-container>
+    <b-row>
+      <b-col v-if="isStudioMode">
+        <b-card
+            :img-src="imagePreview"
+            img-top
+            no-body
+        >
+          <template #header>
+            <h4 class="mb-0">Preview {{ currentScene }}</h4>
+          </template>
+        </b-card>
+      </b-col>
+      <b-col v-if="isStudioMode">
+        Control
+      </b-col>
+      <b-col>
+        <b-card
+            :img-src="imageCurrent"
+            img-top
+            no-body
+        >
+          <template #header>
+            <h4 class="mb-0">Current {{ currentScene }}</h4>
+          </template>
+        </b-card>
+      </b-col>
+    </b-row>
+
+
     <b-card>
-      <b-img :src="imagePreview"/>
-      <b-img :src="imageCurrent"/>
       <b-button @click="getSource">
         Test
       </b-button>
@@ -29,6 +56,7 @@ export default class HomeView extends Vue {
   @obs.Action('source/active') sourceActive
   @obs.Action('source/screenshot') sourceScreenshot
 
+  @obs.Getter isStudioMode: boolean
   imageCurrent = ''
   imagePreview = ''
 
@@ -38,8 +66,6 @@ export default class HomeView extends Vue {
       this.sourceScreenshot({
         sourceName: val,
         imageFormat:'jpg',
-        imageWidth: 960,
-        imageHeight: 540,
 
       }).then((state:OBSResponseTypes['GetSourceScreenshot'])=>{
         this.imageCurrent = state.imageData
@@ -50,12 +76,12 @@ export default class HomeView extends Vue {
 
   @Watch('previewScene')
   onPreviewSceneChanged(val: string, oldVal: string) {
+    if(!this.isStudioMode)
+      return;
     setTimeout(()=>{
       this.sourceScreenshot({
         sourceName: val,
         imageFormat:'jpg',
-        imageWidth: 960,
-        imageHeight: 540,
 
       }).then((state:OBSResponseTypes['GetSourceScreenshot'])=>{
         this.imagePreview = state.imageData

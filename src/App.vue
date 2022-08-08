@@ -15,6 +15,16 @@
         <!-- Right aligned nav items -->
         <b-navbar-nav class="ml-auto">
           <b-navbar-nav v-if="connectionReady" right>
+            <b-nav-item id="popover-studio" @click="setStudiomode(!isStudioMode)">
+              <b-icon v-if="isStudioMode" icon="layout-split" variant="success" />
+              <b-icon v-else icon="layout-split" variant="danger"/>
+              <b-popover target="popover-studio" triggers="hover" placement="bottom">
+                <template v-if="isCamActive" #title>Studiomode On</template>
+                <template v-else #title>Studiomode Off</template>
+                <span v-if="isCamActive">Studiomode deaktivieren?</span>
+                <span v-else>Studiomode aktivieren?</span>
+              </b-popover>
+            </b-nav-item>
             <b-nav-item id="popover-cam" @click="toogleCam">
               <b-icon v-if="isCamActive" icon="camera-video" variant="success" />
               <b-icon v-else  icon="camera-video-off" variant="danger"/>
@@ -63,7 +73,9 @@ export default class App extends mixins(Fullscreen) {
   @obs.Getter connectionReady: boolean
   @obs.Getter isCamActive: boolean
   @obs.Getter isStreamActive: boolean
+  @obs.Getter isStudioMode: boolean
 
+  @obs.Action('studio/set') setStudiomode
   @obs.Action('cam/toogle') toogleCam
   @obs.Action('stream/toogle') toogleStream
 
