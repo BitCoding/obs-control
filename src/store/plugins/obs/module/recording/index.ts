@@ -34,7 +34,7 @@ const obsRecordingModule: Module<RecordingState, RootState> = {
         },
         async 'recording/reload'({getters:{client},commit}){
             const status: OBSResponseTypes['GetRecordStatus'] = await client.call('GetRecordStatus')
-            console.log(status)
+
             commit('recording/set/active',status.outputActive)
             // @ts-expect-error TODO Waiting Update obs-websocket-js
             commit('recording/set/paused',status.outputPaused)
