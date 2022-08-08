@@ -16,14 +16,19 @@ const obsRecordingModule: Module<RecordingState, RootState> = {
     actions: {
         'init'({getters:{client}, commit}) {
             client.on('RecordStateChanged', (state:OBSEventTypes['RecordStateChanged']) => {
-                commit('recording/set/active',state.outputActive)
-                // @ts-expect-error TODO Waiting Update obs-websocket-js
-                const path = state.outputPath
-                if(!state.outputActive && path){
-                    commit('recording/set/lastPath',path)
-                }else{
-                    commit('recording/set/path',path)
+                if(state.outputState === "OBS_WEBSOCKET_OUTPUT_PAUSED" || state.outputState === "OBS_WEBSOCKET_OUTPUT_RESUMED"){
+                    commit('recording/set/paused',!state.outputActive)
+                }else {
+                    commit('recording/set/active',state.outputActive)
+                    // @ts-expect-error TODO Waiting Update obs-websocket-js
+                    const path = state.outputPath
+                    if(!state.outputActive && path){
+                        commit('recording/set/lastPath',path)
+                    }else{
+                        commit('recording/set/path',path)
+                    }
                 }
+
             });
         },
         'connection/closed'({commit}) {
@@ -50,6 +55,15 @@ const obsRecordingModule: Module<RecordingState, RootState> = {
         },
         async 'recording/toogle'({getters:{client},commit}){
             await client.call('ToggleRecord')
+        },
+        async 'recording/resume'({getters:{client}}){
+            await client.call('ResumeRecord')
+        },
+        async 'recording/pause'({getters:{client}}){
+            await client.call('PauseRecord')
+        },
+        async 'recording/togglePause'({getters:{client},commit}){
+            await client.call('ToggleRecordPause')
         }
     },
     getters: {
