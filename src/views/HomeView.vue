@@ -1,32 +1,74 @@
 <template>
   <b-container>
     <b-card>
-
+      <b-img :src="imagePreview"/>
+      <b-img :src="imageCurrent"/>
+      <b-button @click="getSource">
+        Test
+      </b-button>
     </b-card>
   </b-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { State, Getter, Mutation, Action, namespace } from 'vuex-class'
-import {ObsConnectInfo, ObsState} from "@/store/plugins/obs/types";
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import { namespace } from 'vuex-class'
+import {OBSResponseTypes} from "obs-websocket-js/dist/types";
+import {ObsConnectInfo} from "@/store/plugins/obs/types";
 
 
-const ObsGetter = namespace('obs', Getter)
-const ObsAction = namespace('obs', Action)
-const ObsMutation = namespace('obs', Mutation)
+const obs = namespace('obs')
 
 @Component({
   components: {
   },
 })
 export default class HomeView extends Vue {
+  @obs.Getter('getCurrentScene') currentScene
+  @obs.Getter('getPreviewScene') previewScene
+  @obs.Action('source/active') sourceActive
+  @obs.Action('source/screenshot') sourceScreenshot
 
-  @State obs: ObsState
-  @ObsGetter connectionReady: boolean
-  @ObsGetter isStudioMode: boolean
-  @ObsAction('studio/set') setBo
-  @ObsAction('stream/caption') sendCaption
-  @ObsAction('scenes/set/previewScene') setPreview
+  imageCurrent = ''
+  imagePreview = ''
+
+  @Watch('currentScene')
+  onSceneChanged(val: string, oldVal: string) {
+    setTimeout(()=>{
+      this.sourceScreenshot({
+        sourceName: val,
+        imageFormat:'jpg',
+        imageWidth: 960,
+        imageHeight: 540,
+
+      }).then((state:OBSResponseTypes['GetSourceScreenshot'])=>{
+        this.imageCurrent = state.imageData
+        console.log(state);
+      })
+    },1000)
+  }
+
+  @Watch('previewScene')
+  onPreviewSceneChanged(val: string, oldVal: string) {
+    setTimeout(()=>{
+      this.sourceScreenshot({
+        sourceName: val,
+        imageFormat:'jpg',
+        imageWidth: 960,
+        imageHeight: 540,
+
+      }).then((state:OBSResponseTypes['GetSourceScreenshot'])=>{
+        this.imagePreview = state.imageData
+      })
+    },1000)
+  }
+
+  getSource(){
+    this.sourceActive({
+      sourceName: "Minecraft"
+    }).then((state:OBSResponseTypes['GetSourceActive'])=>{
+      console.log(state);
+    })
+  }
 }
 </script>

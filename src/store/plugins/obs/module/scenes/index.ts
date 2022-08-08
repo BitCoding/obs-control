@@ -11,9 +11,15 @@ const obsScenesModule: Module<SceneState, RootState> = {
         scenes: [],
     },
     actions: {
-        'init'({getters:{client}, commit}) {
+        'init'({getters:{client}, commit,dispatch}) {
             client.on('CurrentProgramSceneChanged', (state:OBSEventTypes['CurrentProgramSceneChanged']) => commit('scenes/set/current',state.sceneName));
             client.on('CurrentPreviewSceneChanged', (state:OBSEventTypes['CurrentPreviewSceneChanged']) => commit('scenes/set/preview',state.sceneName));
+
+            // TODO
+            client.on('SceneCreated', () => dispatch('scenes/reload'));
+            client.on('SceneRemoved', () => dispatch('scenes/reload'));
+            client.on('SceneNameChanged', () => dispatch('scenes/reload'));
+            client.on('SceneListChanged', () => dispatch('scenes/reload'));
         },
         'connection/closed'({commit}) {
             commit('scenes/reset')
@@ -41,6 +47,12 @@ const obsScenesModule: Module<SceneState, RootState> = {
         },
     },
     getters: {
+        getCurrentScene(state): string {
+            return state.current
+        },
+        getPreviewScene(state): string {
+            return state.preview
+        },
     },
     mutations: {
 
