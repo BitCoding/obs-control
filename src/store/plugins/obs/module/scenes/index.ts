@@ -16,7 +16,7 @@ const obsScenesModule: Module<SceneState, RootState> = {
             client.on('CurrentPreviewSceneChanged', (state:OBSEventTypes['CurrentPreviewSceneChanged']) => commit('scenes/set/preview',state.sceneName));
         },
         'connection/closed'({commit}) {
-            commit('connectionClosed')
+            commit('scenes/reset')
         },
         async 'connection/ready'({dispatch}) {
             return dispatch('scenes/reload')
@@ -43,6 +43,12 @@ const obsScenesModule: Module<SceneState, RootState> = {
     getters: {
     },
     mutations: {
+
+        'scenes/reset'(state) {
+            state.current = ''
+            state.preview = ''
+            state.scenes = []
+        },
         'scenes/set/current'(state, current:string) {
             state.current = current
         },
