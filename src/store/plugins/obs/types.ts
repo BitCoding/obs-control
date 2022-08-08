@@ -16,6 +16,13 @@ export interface StreamState {
     status: OBSResponseTypes['GetStreamStatus']
 }
 export interface RecordingState {
+    active: boolean
+    paused: boolean
+    path: string|null
+    last_path: string|null
+    bytes: number
+    duration: number
+    timecode: string
 }
 export interface HotkeyState {
     hotkeys: string[]

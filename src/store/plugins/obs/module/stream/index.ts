@@ -32,14 +32,14 @@ const obsStreamModule: Module<StreamState, RootState> = {
             const status: OBSResponseTypes['GetStreamStatus'] = await client.call('GetStreamStatus')
             commit('stream/status',status)
         },
-        async 'stream/start'({getters:{client}}){
-            await client.call('StartStream')
-        },
         // TODO Only on Stream
         async 'stream/caption'({getters:{client}}, text: string){
             await client.call('SendStreamCaption',{
                 captionText: text
             })
+        },
+        async 'stream/start'({getters:{client}}){
+            await client.call('StartStream')
         },
         async 'stream/stop'({getters:{client}}){
             await client.call('StopStream')
